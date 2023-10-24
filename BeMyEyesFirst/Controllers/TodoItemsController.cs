@@ -18,14 +18,12 @@ public class TodoItemsController : ControllerBase
 {
     private readonly TodoContext _context;
 
-    private readonly DescribeImageSampleService describeImageSampleService;
-
-    public static string subscriptionKey = Environment.GetEnvironmentVariable("COMPUTER_VISION_SUBSCRIPTION_KEY");
-    public static string endpoint = Environment.GetEnvironmentVariable("COMPUTER_VISION_ENDPOINT");
+    private readonly DescribeImageService describeImageSampleService;
 
     public TodoItemsController(TodoContext context)
     {
         _context = context;
+        describeImageSampleService = new DescribeImageService();
     }
 
     // GET: api/TodoItems
@@ -39,45 +37,46 @@ public class TodoItemsController : ControllerBase
 
     // GET: api/TodoItems/5
     // <snippet_GetByID>
-    [HttpGet("{id}")]
-    public async Task<ActionResult<TodoItemDTO>> GetTodoItem(long id)
+    [HttpGet("{url}")]
+    public async Task<bool> GetTodoItem(string url) 
     {
-        var todoItem = await _context.TodoItems.FindAsync(id);
+        //var todoItem = await _context.TodoItems.FindAsync(id);
+        url = url.Replace("%2F", "/");
 
-        await DescribeImageSampleService.RunAsync(endpoint, subscriptionKey);
-        Console.WriteLine("\nPress ENTER to exit.");
+        await describeImageSampleService.DescribeImageFromUrl(url);
         Console.ReadLine();
 
-        ComputerVisionClient client = Authenticate(endpoint, subscriptionKey);
+        await describeImageSampleService.AnalyzeImageFromUrl(url);
+        Console.WriteLine("\nPress ENTER to exit.");
 
-        
-        var response = client.AnalyzeImageAsync("https://png2jpg.com/images/png2jpg/icon.png");
-        Console.WriteLine(response.Result.ToJson());
+        //ComputerVisionClient client = Authenticate(endpoint, subscriptionKey);
+        //    var response = client.AnalyzeImageAsync("https://png2jpg.com/images/png2jpg/icon.png");
+        //    Console.WriteLine(response.Result.ToJson());
 
-        using var imageSource = VisionSource.FromUrl(
-    new Uri("https://learn.microsoft.com/azure/ai-services/computer-vision/media/quickstarts/presentation.png"));
+        //    using var imageSource = VisionSource.FromUrl(
+        //new Uri("https://learn.microsoft.com/azure/ai-services/computer-vision/media/quickstarts/presentation.png"));
 
-        var analysisOptions = new ImageAnalysisOptions()
-        {
-            Features =
-          ImageAnalysisFeature.CropSuggestions
-        | ImageAnalysisFeature.Caption
-        | ImageAnalysisFeature.DenseCaptions
-        | ImageAnalysisFeature.Objects
-        | ImageAnalysisFeature.People
-        | ImageAnalysisFeature.Text
-        | ImageAnalysisFeature.Tags
-        };
-        var serviceOptions = new VisionServiceOptions(endpoint, new AzureKeyCredential(subscriptionKey));
+        //    var analysisOptions = new ImageAnalysisOptions()
+        //    {
+        //        Features =
+        //      ImageAnalysisFeature.CropSuggestions
+        //    | ImageAnalysisFeature.Caption
+        //    | ImageAnalysisFeature.DenseCaptions
+        //    | ImageAnalysisFeature.Objects
+        //    | ImageAnalysisFeature.People
+        //    | ImageAnalysisFeature.Text
+        //    | ImageAnalysisFeature.Tags
+        //    };
+        //    var serviceOptions = new VisionServiceOptions(endpoint, new AzureKeyCredential(subscriptionKey));
 
-        using var analyzer = new ImageAnalyzer(serviceOptions, imageSource, analysisOptions);
+        //    using var analyzer = new ImageAnalyzer(serviceOptions, imageSource, analysisOptions);
 
-        if (todoItem == null)
-        {
-            return NotFound();
-        }
+        //if (response == null)
+        //{
+        //    return false;
+        //}
 
-        return ItemToDTO(todoItem);
+        return true;
     }
 
     public static ComputerVisionClient Authenticate(string endpoint, string key)
