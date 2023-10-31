@@ -17,8 +17,8 @@
       "applicationUrl": "http://localhost:5127",
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "COMPUTER_VISION_SUBSCRIPTION_KEY": "a5fafb931b2b42fb87d02a6b53404129",
-        "COMPUTER_VISION_ENDPOINT": "https://emirhanservice.cognitiveservices.azure.com/"
+        "COMPUTER_VISION_SUBSCRIPTION_KEY": "0c6c47598836461eba28da05d522edb8",
+        "COMPUTER_VISION_ENDPOINT": "https://bemyeyesallinone.cognitiveservices.azure.com/"
       }
     },
     "https": {

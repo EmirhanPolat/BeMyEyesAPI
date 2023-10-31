@@ -2,51 +2,55 @@
 using Azure.AI.Vision.Common;
 using Azure.AI.Vision.ImageAnalysis;
 using BeMyEyesFirst.Services;
+using Humanizer.Bytes;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Azure.CognitiveServices.Vision.ComputerVision;
 using Microsoft.Azure.CognitiveServices.Vision.ComputerVision.Models;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Internal;
+using Newtonsoft.Json.Linq;
 using NuGet.Protocol;
+using System.Text;
 using TodoApi.Models;
 
 namespace TodoApi.Controllers;
 
 [Route("api/[controller]")]
 [ApiController]
-public class TodoItemsController : ControllerBase
+public class HeyController : ControllerBase
 {
     private readonly TodoContext _context;
 
     private readonly DescribeImageService describeImageSampleService;
 
-    public TodoItemsController(TodoContext context)
+    public HeyController(TodoContext context)
     {
         _context = context;
         describeImageSampleService = new DescribeImageService();
     }
 
-    // GET: api/TodoItems
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<TodoItemDTO>>> GetTodoItems()
+    private async Task<byte[]> FromBase64ToByteArray(Stream stream)
     {
-        return await _context.TodoItems
-            .Select(x => ItemToDTO(x))
-            .ToListAsync();
+        using (StreamReader reader = new StreamReader(stream, Encoding.UTF8))
+        {
+            string requestBody = await reader.ReadToEndAsync();
+            // Log or process the request body as needed
+            JObject payload = JObject.Parse(requestBody);
+            Console.WriteLine("Received Payload:");
+            Console.WriteLine(payload["image_data"]);
+
+            return Convert.FromBase64String(payload["image_data"].ToString());
+        }
     }
 
-    // GET: api/TodoItems/5
+    // GET: api/ProcessImage
     // <snippet_GetByID>
-    [HttpGet("{url}")]
-    public async Task<bool> GetTodoItem(string url) 
+    [HttpPost()]
+    public async Task<bool> ProcessImage() 
     {
-        //var todoItem = await _context.TodoItems.FindAsync(id);
-        url = url.Replace("%2F", "/");
+        byte[] byteData = FromBase64ToByteArray(Request.Body).Result;
 
-        await describeImageSampleService.DescribeImageFromUrl(url);
-        Console.ReadLine();
-
-        await describeImageSampleService.AnalyzeImageFromUrl(url);
+        await describeImageSampleService.DescribeImageFromByteAsync(byteData);
         Console.WriteLine("\nPress ENTER to exit.");
 
         //ComputerVisionClient client = Authenticate(endpoint, subscriptionKey);
@@ -86,89 +90,4 @@ public class TodoItemsController : ControllerBase
           { Endpoint = endpoint };
         return client;
     }
-    // </snippet_GetByID>
-
-    // PUT: api/TodoItems/5
-    // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-    // <snippet_Update>
-    [HttpPut("{id}")]
-    public async Task<IActionResult> PutTodoItem(long id, TodoItemDTO todoDTO)
-    {
-        if (id != todoDTO.Id)
-        {
-            return BadRequest();
-        }
-
-        var todoItem = await _context.TodoItems.FindAsync(id);
-        if (todoItem == null)
-        {
-            return NotFound();
-        }
-
-        todoItem.Name = todoDTO.Name;
-        todoItem.IsComplete = todoDTO.IsComplete;
-
-        try
-        {
-            await _context.SaveChangesAsync();
-        }
-        catch (DbUpdateConcurrencyException) when (!TodoItemExists(id))
-        {
-            return NotFound();
-        }
-
-        return NoContent();
-    }
-    // </snippet_Update>
-
-    // POST: api/TodoItems
-    // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-    // <snippet_Create>
-    [HttpPost]
-    public async Task<ActionResult<TodoItemDTO>> PostTodoItem(TodoItemDTO todoDTO)
-    {
-        var todoItem = new TodoItem
-        {
-            IsComplete = todoDTO.IsComplete,
-            Name = todoDTO.Name
-        };
-
-        _context.TodoItems.Add(todoItem);
-        await _context.SaveChangesAsync();
-
-        return CreatedAtAction(
-            nameof(GetTodoItem),
-            new { id = todoItem.Id },
-            ItemToDTO(todoItem));
-    }
-    // </snippet_Create>
-
-    // DELETE: api/TodoItems/5
-    [HttpDelete("{id}")]
-    public async Task<IActionResult> DeleteTodoItem(long id)
-    {
-        var todoItem = await _context.TodoItems.FindAsync(id);
-        if (todoItem == null)
-        {
-            return NotFound();
-        }
-
-        _context.TodoItems.Remove(todoItem);
-        await _context.SaveChangesAsync();
-
-        return NoContent();
-    }
-
-    private bool TodoItemExists(long id)
-    {
-        return _context.TodoItems.Any(e => e.Id == id);
-    }
-
-    private static TodoItemDTO ItemToDTO(TodoItem todoItem) =>
-       new TodoItemDTO
-       {
-           Id = todoItem.Id,
-           Name = todoItem.Name,
-           IsComplete = todoItem.IsComplete
-       };
 }
