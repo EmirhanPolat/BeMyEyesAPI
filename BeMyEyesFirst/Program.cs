@@ -12,6 +12,7 @@ builder.Services.AddDbContext<TodoContext>(opt =>
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+builder.Services.AddAuthentication();
 
 var app = builder.Build();
 
