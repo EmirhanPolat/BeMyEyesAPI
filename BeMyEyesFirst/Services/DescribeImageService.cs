@@ -7,7 +7,7 @@
     using System.Net.Http.Headers;
     using TodoApi.Models;
 
-    public class DescribeImageService
+    public class DescribeImageService 
     {
         public static string subscriptionKey = Environment.GetEnvironmentVariable("RESOURCE_SUBSCRIPTION_KEY");
         public static string endpoint = Environment.GetEnvironmentVariable("RESOURCE_ENDPOINT");
@@ -17,7 +17,7 @@
             Endpoint = endpoint
         };
 
-        public async Task AnalyzeImageFromByteCVClient(byte[] byteData)
+        public async Task<(int ,string)> AnalyzeImageFromByteCVClient(byte[] byteData)
         {
 
             // Specify features to be retrieved
@@ -32,6 +32,11 @@
                 };
 
             var analysis = await cvClient.AnalyzeImageInStreamAsync(new MemoryStream(byteData), features);
+
+            if (analysis == null)
+            {
+                return (0, "Analysis failed");
+            }
 
             ImageCaption caption = analysis.Description.Captions.First();
 
@@ -51,7 +56,7 @@
             };
 
 
-            Console.ReadLine();
+            return (1, myImageDescription.Text);
         }
 
         /// <summary>
