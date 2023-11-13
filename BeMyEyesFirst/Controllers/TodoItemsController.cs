@@ -2,8 +2,6 @@
 
 using BeMyEyesFirst.Services;
 using Microsoft.AspNetCore.Mvc;
-using Newtonsoft.Json.Linq;
-using System.Text;
 
 
 [Route("api/[controller]")]
@@ -23,35 +21,27 @@ public class HeyController : ControllerBase
     // GET: api/ProcessImage
     // <snippet_GetByID>
     [HttpPost("processImage")]
-    public async Task<bool> ProcessImage() 
+    public async Task<IActionResult> ProcessImage(IFormFile imageFile) 
     {
-        // Get the image stream
-        byte[] byteData = FromBase64ToByteArray(Request.Body).Result;
-
-        if (byteData == null)
+        if (imageFile == null)
         {
-            return false;
+            return BadRequest("Invalid image upload");
         }
 
-        //textToSpeechService.TranslateTextToSpeech();
-        
-        //await describeImageSampleService.AnalyzeImageFromByteCVClient(byteData);
-
-        //await describeImageSampleService.AnalyzeImageFromByteHttpClient(byteData);
-
-        return true;
-    }
-
-    private async Task<byte[]> FromBase64ToByteArray(Stream stream)
-    {
-        using (StreamReader reader = new StreamReader(stream, Encoding.UTF8))
+        byte[] imageBytes;
+        using (var ms = new MemoryStream())
         {
-            string requestBody = await reader.ReadToEndAsync();
-            JObject payload = JObject.Parse(requestBody);
-            //Console.WriteLine("Received Payload:");
-            //Console.WriteLine(payload["image_data"]);
-
-            return Convert.FromBase64String(payload["image_data"].ToString());
+            imageFile.CopyTo(ms);
+            imageBytes = ms.ToArray();
         }
-    }
+
+        var (status, message) = await describeImageSampleService.AnalyzeImageFromByteCVClient(imageBytes);
+
+        if(status == 0)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, message);
+        }
+
+        return Ok(message);
+    }    
 }
