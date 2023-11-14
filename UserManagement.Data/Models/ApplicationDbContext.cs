@@ -10,6 +10,6 @@ namespace UserManagement.Data.Models
 
         }
 
-        public DbSet<User> Users {  get; set; }
+        public override DbSet<User> Users {  get; set; }
     }
 }

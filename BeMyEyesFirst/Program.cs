@@ -13,7 +13,6 @@ builder.Services.AddTransient<IAuthService, AuthService>();
 // Add services to the container.
 
 builder.Services.AddControllers();
-// Add DbContext to the project (Dependency Injection Container) and configure InMemoryDb
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 

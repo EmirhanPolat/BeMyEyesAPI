@@ -22,6 +22,7 @@ namespace BeMyEyesFirst.Services
         public async Task<(int, string)> Registration(RegistrationModel model, string[] roles)
         {
             var userExists = await userManager.FindByNameAsync(model.Username);
+
             if (userExists != null)
                 return (0, "User already exists");
 
@@ -34,6 +35,7 @@ namespace BeMyEyesFirst.Services
                 LastName = model.LastName,
             };
             var createUserResult = await userManager.CreateAsync(user, model.Password);
+
             if (!createUserResult.Succeeded)
                 return (0, "User creation failed! Please check user details and try again.");
 
@@ -52,6 +54,7 @@ namespace BeMyEyesFirst.Services
         public async Task<(int, string)> Login(LoginModel model)
         {
             var user = await userManager.FindByNameAsync(model.Username);
+
             if (user == null)
                 return (0, "Invalid username");
             if (!await userManager.CheckPasswordAsync(user, model.Password))

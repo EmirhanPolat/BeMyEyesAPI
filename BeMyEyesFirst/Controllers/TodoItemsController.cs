@@ -9,13 +9,12 @@ using Microsoft.AspNetCore.Mvc;
 public class HeyController : ControllerBase
 {
     private readonly DescribeImageService describeImageSampleService;
-
-    private readonly TextToSpeechService textToSpeechService;
+    private readonly MoneyPredictionService moneyPredictionService;
 
     public HeyController()
     {
         describeImageSampleService = new DescribeImageService();
-        textToSpeechService = new TextToSpeechService();
+        moneyPredictionService = new MoneyPredictionService();
     }
 
     // GET: api/ProcessImage
@@ -43,5 +42,32 @@ public class HeyController : ControllerBase
         }
 
         return Ok(message);
-    }    
+    }
+
+    // GET: api/ProcessImage
+    // <snippet_GetByID>
+    [HttpPost("predictImage")]
+    public async Task<IActionResult> PredictImage(IFormFile imageFile)
+    {
+        if (imageFile == null)
+        {
+            return BadRequest("Invalid image upload");
+        }
+
+        byte[] imageBytes;
+        using (var ms = new MemoryStream())
+        {
+            imageFile.CopyTo(ms);
+            imageBytes = ms.ToArray();
+        }
+
+        var (status, message) = await moneyPredictionService.PredictImageTags(imageBytes);
+
+        if (status == 0)
+        {
+            return StatusCode(StatusCodes.Status500InternalServerError, message);
+        }
+
+        return Ok(message);
+    }
 }
