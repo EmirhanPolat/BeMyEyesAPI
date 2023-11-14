@@ -2,7 +2,7 @@
 {
     public class MyImageDescription
     {
-        public string Text { get; set; }
+        public string? Text { get; set; }
         public double Confidence { get; set; }
 
     }

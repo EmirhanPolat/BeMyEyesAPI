@@ -19,7 +19,9 @@
         "ASPNETCORE_ENVIRONMENT": "Development",
         "RESOURCE_SUBSCRIPTION_KEY": "0c6c47598836461eba28da05d522edb8",
         "RESOURCE_ENDPOINT": "https://bemyeyesallinone.cognitiveservices.azure.com/",
-        "RESOURCE_REGION": "eastus"
+        "RESOURCE_REGION": "eastus",
+        "PREDICTION_KEY": "0c6c47598836461eba28da05d522edb8",
+        "PREDICTION_RESOURCE_ID": "/subscriptions/b7a5c091-2bc3-4dc0-a110-7a49b1f0ebf3/resourceGroups/BeMyEyes/providers/Microsoft.CognitiveServices/accounts/BeMyEyesAllInOne"
       }
     },
     "BeMyEyesApi.Production": {
