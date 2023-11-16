@@ -1,7 +1,6 @@
 ﻿namespace BeMyEyesFirst.Services
 {
     using Microsoft.Azure.CognitiveServices.Vision.CustomVision.Prediction;
-    using Microsoft.Azure.CognitiveServices.Vision.CustomVision.Prediction.Models;
     using Microsoft.Rest;
     using NuGet.Protocol;
 

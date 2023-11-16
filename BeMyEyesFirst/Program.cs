@@ -3,12 +3,10 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
-using UserManagement.Data;
-using UserManagement.Data.Models;
+
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddTransient<IAuthService, AuthService>();
 
 // Add services to the container.
 
@@ -21,12 +19,6 @@ var env = builder.Environment;
 builder.Configuration.SetBasePath(env.ContentRootPath)
     .AddJsonFile("appsettings.json", optional:false)
     .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional:true);
-
-builder.Services.AddPersistence(builder.Configuration);
-
-builder.Services.AddIdentity<User, IdentityRole>()
-    .AddEntityFrameworkStores<ApplicationDbContext>()
-    .AddDefaultTokenProviders();
 
 builder.Services.AddAuthentication(opt =>
 {
