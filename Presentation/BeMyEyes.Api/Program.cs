@@ -9,7 +9,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddTransient<IDescribeImageService, DescribeImageService>();
+builder.Services.AddTransient<IComputerVisionService, ComputerVisionService>();
+builder.Services.AddTransient<ICustomVisionService, CustomVisionService>();
 
 var env = builder.Environment;
 

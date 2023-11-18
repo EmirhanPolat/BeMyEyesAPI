@@ -5,7 +5,7 @@ using Microsoft.Azure.CognitiveServices.Vision.ComputerVision.Models;
 namespace BeMyEyes.Infrastructure.Services.AIServices
 {
 
-    public class DescribeImageService : IDescribeImageService
+    public class ComputerVisionService : IComputerVisionService
     {
         private static string subscriptionKey = Environment.GetEnvironmentVariable("RESOURCE_SUBSCRIPTION_KEY");
         private static string endpoint = Environment.GetEnvironmentVariable("RESOURCE_ENDPOINT");

@@ -1,4 +1,5 @@
 ﻿using BeMyEyes.Application.Interfaces.AIServices;
+using BeMyEyes.Infrastructure.Services.AIServices;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BeMyEyes.Api.Controllers
@@ -7,11 +8,13 @@ namespace BeMyEyes.Api.Controllers
     [ApiController]
     public class ImageAnalysisController : Controller
     {
-        private readonly IDescribeImageService _describeImageService;
+        private readonly IComputerVisionService _computerVisionService;
+        private readonly ICustomVisionService _customVisionService;
 
-        public ImageAnalysisController(IDescribeImageService describeImageService)
+        public ImageAnalysisController(IComputerVisionService computerVisionService, ICustomVisionService customVisionService)
         {
-            _describeImageService = describeImageService;    
+            _computerVisionService = computerVisionService;
+            _customVisionService = customVisionService;
         }
 
         [HttpPost("describeImage")]
@@ -29,7 +32,7 @@ namespace BeMyEyes.Api.Controllers
                 imageBytes = ms.ToArray();
             }
 
-            var (status, message) = await _describeImageService.GetDescriptionsInImage(imageBytes);
+            var (status, message) = await _computerVisionService.GetDescriptionsInImage(imageBytes);
 
             if (status == 0)
             {
@@ -54,7 +57,7 @@ namespace BeMyEyes.Api.Controllers
                 imageBytes = ms.ToArray();
             }
 
-            var result = await _describeImageService.GetObjectsInImage(imageBytes);
+            var result = await _computerVisionService.GetObjectsInImage(imageBytes);
 
             if (result == null)
             {
@@ -79,7 +82,7 @@ namespace BeMyEyes.Api.Controllers
                 imageBytes = ms.ToArray();
             }
 
-            var result = await _describeImageService.GetTagsInImage(imageBytes);
+            var result = await _computerVisionService.GetTagsInImage(imageBytes);
 
             if (result == null)
             {
@@ -87,6 +90,26 @@ namespace BeMyEyes.Api.Controllers
             }
 
             return Ok(result);
+        }
+
+        [HttpPost("moneyPredict")]
+        public async Task<IActionResult> GetPredictionForMoney(IFormFile imageFile)
+        {
+            if (imageFile == null)
+            {
+                return BadRequest("Invalid image upload");
+            }
+
+            byte[] imageBytes;
+            using (var ms = new MemoryStream())
+            {
+                imageFile.CopyTo(ms);
+                imageBytes = ms.ToArray();
+            }
+
+            var (probability, tag) = await _customVisionService.PredictImageTags(imageBytes);
+
+            return Ok(tag);
         }
     }
 }

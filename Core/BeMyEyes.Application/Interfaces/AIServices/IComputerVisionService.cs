@@ -1,6 +1,6 @@
 ﻿namespace BeMyEyes.Application.Interfaces.AIServices
 {
-    public interface IDescribeImageService
+    public interface IComputerVisionService
     {
         Task<(int, string)> GetDescriptionsInImage(byte[] byteData);
 
