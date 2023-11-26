@@ -8,8 +8,8 @@ namespace BeMyEyes.Infrastructure.Services.AIServices
 
     public class ComputerVisionService : IComputerVisionService
     {
-        private string subscriptionKey = Environment.GetEnvironmentVariable("RESOURCE_SUBSCRIPTION_KEY");
-        private string endpoint = Environment.GetEnvironmentVariable("RESOURCE_ENDPOINT");
+        private string subscriptionKey;
+        private string endpoint;
 
         private readonly IConfiguration _configuration;
         private static IComputerVisionClient cvClient;
@@ -18,7 +18,9 @@ namespace BeMyEyes.Infrastructure.Services.AIServices
         {
             _configuration = configuration;
             GetResourceVariables();
-            cvClient = new ComputerVisionClient(new ApiKeyServiceClientCredentials(subscriptionKey)){
+
+            cvClient = new ComputerVisionClient(new ApiKeyServiceClientCredentials(subscriptionKey))
+            {
                 Endpoint = endpoint
             };
         }
