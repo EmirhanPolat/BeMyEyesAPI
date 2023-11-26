@@ -1,19 +1,27 @@
 ﻿using BeMyEyes.Application.Interfaces.AIServices;
 using Microsoft.Azure.CognitiveServices.Vision.CustomVision.Prediction;
 using Microsoft.Azure.CognitiveServices.Vision.CustomVision.Prediction.Models;
+using Microsoft.Extensions.Configuration;
 
 namespace BeMyEyes.Infrastructure.Services.AIServices
 {
     public class CustomVisionService : ICustomVisionService
     {
-        private static string predictionEndpoint = Environment.GetEnvironmentVariable("RESOURCE_ENDPOINT");
-        private static string predictionKey = Environment.GetEnvironmentVariable("PREDICTION_KEY");
-        private static Guid projectId = new Guid("fcef7194-78b7-4fde-a411-b09281dc8c92");
+        private readonly IConfiguration _configuration;
+        private string predictionEndpoint;
+        private string predictionKey;
+        private static Guid projectId;
+        private static ICustomVisionPredictionClient predictionClient;
 
-        private static ICustomVisionPredictionClient predictionClient = new CustomVisionPredictionClient(new ApiKeyServiceClientCredentials(predictionKey))
+        public CustomVisionService(IConfiguration configuration)
         {
-            Endpoint = predictionEndpoint
-        };
+            _configuration = configuration;
+            GetResourceVariables();
+            predictionClient = new CustomVisionPredictionClient(new ApiKeyServiceClientCredentials(predictionKey))
+            {
+                Endpoint = predictionEndpoint
+            };
+        }
 
         public async Task<(double, string)> PredictImageTags(byte[] byteData)
         {
@@ -21,14 +29,35 @@ namespace BeMyEyes.Infrastructure.Services.AIServices
             {
                 var prediction = await predictionClient.ClassifyImageAsync(projectId, "MoneyClassification", new MemoryStream(byteData));
 
-                return (prediction.Predictions.First().Probability, prediction.Predictions.First().TagName);
+                if (prediction.Predictions.First().Probability >= 0.5)
+                {
+                    return (prediction.Predictions.First().Probability, prediction.Predictions.First().TagName);
+                }
+                else
+                {
+                    return (0, "Could not identify the value of the money");
+                }
             }
             catch (CustomVisionErrorException ex)
             {
                 Console.WriteLine($"Custom Vision Error: {ex.Response.StatusCode} - {ex.Response.ReasonPhrase}");
                 Console.WriteLine($"Error Content: {ex.Response.Content}");
-               
+
                 return (0, "Predd failed");
+            }
+        }
+
+        private void GetResourceVariables()
+        {
+            try
+            {
+                predictionKey = _configuration.GetSection("CognitiveServices")["PREDICTION_KEY"];
+                predictionEndpoint = _configuration.GetSection("CognitiveServices")["RESOURCE_ENDPOINT"];
+                projectId = new Guid("fcef7194-78b7-4fde-a411-b09281dc8c92");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in GetResourceVariables: {ex.Message}");
             }
         }
     }

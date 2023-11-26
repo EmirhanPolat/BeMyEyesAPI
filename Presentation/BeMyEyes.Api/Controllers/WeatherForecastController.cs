@@ -1,12 +1,9 @@
-using BeMyEyes.Domain.Entities;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BeMyEyes.Api.Controllers
 {
     [ApiController]
     [Route("[controller]")]
-    [Authorize(Roles = "User")]
     public class WeatherForecastController : ControllerBase
     {
         private static readonly string[] Summaries = new[]

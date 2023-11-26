@@ -1,5 +1,4 @@
 ﻿using BeMyEyes.Application.Interfaces.AIServices;
-using BeMyEyes.Infrastructure.Services.AIServices;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BeMyEyes.Api.Controllers
