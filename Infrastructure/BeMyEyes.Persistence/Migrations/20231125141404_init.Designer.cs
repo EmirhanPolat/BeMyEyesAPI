@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BeMyEyes.Persistence.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20231116153427_InitAgain")]
-    partial class InitAgain
+    [Migration("20231125141404_init")]
+    partial class init
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)

@@ -1,19 +1,29 @@
 ﻿using BeMyEyes.Application.Interfaces.AIServices;
 using Microsoft.Azure.CognitiveServices.Vision.ComputerVision;
 using Microsoft.Azure.CognitiveServices.Vision.ComputerVision.Models;
+using Microsoft.Extensions.Configuration;
 
 namespace BeMyEyes.Infrastructure.Services.AIServices
 {
 
     public class ComputerVisionService : IComputerVisionService
     {
-        private static string subscriptionKey = Environment.GetEnvironmentVariable("RESOURCE_SUBSCRIPTION_KEY");
-        private static string endpoint = Environment.GetEnvironmentVariable("RESOURCE_ENDPOINT");
+        private string subscriptionKey;
+        private string endpoint;
 
-        private static IComputerVisionClient cvClient = new ComputerVisionClient(new ApiKeyServiceClientCredentials(subscriptionKey))
+        private readonly IConfiguration _configuration;
+        private static IComputerVisionClient cvClient;
+
+        public ComputerVisionService(IConfiguration configuration)
         {
-            Endpoint = endpoint
-        };
+            _configuration = configuration;
+            GetResourceVariables();
+
+            cvClient = new ComputerVisionClient(new ApiKeyServiceClientCredentials(subscriptionKey))
+            {
+                Endpoint = endpoint
+            };
+        }
 
         public async Task<(int, string)> GetDescriptionsInImage(byte[] byteData)
         {
@@ -72,6 +82,19 @@ namespace BeMyEyes.Infrastructure.Services.AIServices
             }
 
             return objectsConfidence;
+        }
+
+        private void GetResourceVariables()
+        {
+            try
+            {
+                subscriptionKey = _configuration.GetSection("CognitiveServices")["RESOURCE_SUBSCRIPTION_KEY"];
+                endpoint = _configuration.GetSection("CognitiveServices")["RESOURCE_ENDPOINT"];
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error in GetResourceVariables: {ex.Message}");
+            }
         }
     }
 }
