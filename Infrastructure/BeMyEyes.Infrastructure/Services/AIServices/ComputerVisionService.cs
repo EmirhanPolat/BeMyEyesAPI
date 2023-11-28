@@ -1,4 +1,5 @@
-﻿using BeMyEyes.Application.Interfaces.AIServices;
+﻿using System;
+using BeMyEyes.Application.Interfaces.AIServices;
 using Microsoft.Azure.CognitiveServices.Vision.ComputerVision;
 using Microsoft.Azure.CognitiveServices.Vision.ComputerVision.Models;
 using Microsoft.Extensions.Configuration;
@@ -25,9 +26,41 @@ namespace BeMyEyes.Infrastructure.Services.AIServices
             };
         }
 
+        public async Task<(int, string)> GetWordsInImage(byte[] byteData)
+        {
+            var url = await cvClient.ReadInStreamAsync(new MemoryStream(byteData));
+            var id = Path.GetFileName(new Uri(url.OperationLocation).LocalPath);
+
+            ReadOperationResult analysis;
+            do
+            {
+                analysis = await cvClient.GetReadResultAsync(new Guid(id));
+            }
+            while (analysis.Status == OperationStatusCodes.Running ||
+                        analysis.Status == OperationStatusCodes.NotStarted);
+
+            Console.WriteLine(url.OperationLocation);
+            var values = analysis.AnalyzeResult.ReadResults;
+
+            Console.WriteLine(analysis.AnalyzeResult.ReadResults);
+            Console.WriteLine(analysis.Status);
+
+            foreach (ReadResult page in values)
+            {
+                foreach (Line line in page.Lines)
+                {
+                    Console.WriteLine(line.Text);
+                }
+            }
+
+            return  (1,"arda");
+        }
+
+
         public async Task<(int, string)> GetDescriptionsInImage(byte[] byteData)
         {
             var analysis = await cvClient.DescribeImageInStreamAsync(new MemoryStream(byteData));
+            
 
             return (1, analysis.Captions.First().Text);
         }
@@ -96,5 +129,6 @@ namespace BeMyEyes.Infrastructure.Services.AIServices
                 Console.WriteLine($"Error in GetResourceVariables: {ex.Message}");
             }
         }
+
     }
 }

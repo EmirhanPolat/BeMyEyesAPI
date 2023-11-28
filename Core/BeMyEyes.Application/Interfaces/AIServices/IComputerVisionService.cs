@@ -7,5 +7,6 @@
         Task<IDictionary<string, double>> GetObjectsInImage(byte[] byteData);
 
         Task<IDictionary<string, double>> GetTagsInImage(byte[] byteData);
+        Task<(int, string)> GetWordsInImage(byte[] imageBytes);
     }
 }

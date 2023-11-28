@@ -7,6 +7,8 @@
     <UserSecretsId>60dd0bbf-67a2-46ce-8963-330de55db57b</UserSecretsId>
   </PropertyGroup>
 
+  <PropertyGroup Condition=" '$(RunConfiguration)' == 'BeMyEyesApi.Production' " />
+  <PropertyGroup Condition=" '$(RunConfiguration)' == 'BeMyEyesApi.Development' " />
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="7.0.10" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="7.0.10" />

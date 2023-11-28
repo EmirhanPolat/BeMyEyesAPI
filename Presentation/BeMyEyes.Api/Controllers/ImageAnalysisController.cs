@@ -91,6 +91,26 @@ namespace BeMyEyes.Api.Controllers
             return Ok(result);
         }
 
+        [HttpPost("wordsImage")]
+        public async Task<IActionResult> GetWordsInImage(IFormFile imageFile)
+        {
+            if (imageFile == null)
+            {
+                return BadRequest("Invalid image upload"); ;
+            }
+            Console.WriteLine("olduuuuu");
+            byte[] imageBytes;
+            using (var ms = new MemoryStream())
+            {
+                imageFile.CopyTo(ms);
+                imageBytes = ms.ToArray();
+            }
+
+            var (val, message) = await _computerVisionService.GetWordsInImage(imageBytes);
+
+            return Ok(message);
+        }
+
         [HttpPost("moneyPredict")]
         public async Task<IActionResult> GetPredictionForMoney(IFormFile imageFile)
         {
