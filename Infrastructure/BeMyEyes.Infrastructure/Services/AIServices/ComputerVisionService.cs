@@ -87,7 +87,7 @@ namespace BeMyEyes.Infrastructure.Services.AIServices
             // Create the payload
             var payload = new
             {
-                model = "gpt-3.5-turbo",
+                model = "gpt-4-vision-preview",
                 messages = new[]
                 {
                     new
@@ -95,16 +95,16 @@ namespace BeMyEyes.Infrastructure.Services.AIServices
                         role = "user",
                         content = new object[]
                         {
-                            new { type = "text", text = "What's in this image" }
-                            //new
-                            //{
-                            //    type = "image_url",
-                            //    image_url = new { url = "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Gfp-wisconsin-madison-the-nature-boardwalk.jpg/2560px-Gfp-wisconsin-madison-the-nature-boardwalk.jpg" }
-                            //}
+                            new { type = "text", text = "What's in this image" },
+                            new
+                            {
+                                type = "image_url",
+                                image_url = new { url = "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Gfp-wisconsin-madison-the-nature-boardwalk.jpg/2560px-Gfp-wisconsin-madison-the-nature-boardwalk.jpg" }
+                            }
                         }
                     }
                 },
-                max_tokens = 3
+                max_tokens = 10
             };
 
             // Serialize the payload to JSON
