@@ -2,6 +2,7 @@ using BeMyEyes.Persistence;
 using BeMyEyes.Infrastructure;
 using BeMyEyes.Application.Interfaces.AIServices;
 using BeMyEyes.Infrastructure.Services.AIServices;
+using Azure.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -20,6 +21,13 @@ builder.Configuration.SetBasePath(env.ContentRootPath)
 
 builder.Services.AddPersistence(builder.Configuration);
 builder.Services.AddInfrastructure(builder.Configuration);
+
+var keyVaultUri = builder.Configuration["KeyVault:Uri"];
+if (!string.IsNullOrEmpty(keyVaultUri))
+{
+    var credential = new DefaultAzureCredential();
+    builder.Configuration.AddAzureKeyVault(new Uri(keyVaultUri), credential);
+}
 
 var app = builder.Build();
 

@@ -51,8 +51,8 @@ namespace BeMyEyes.Infrastructure.Services.AIServices
         {
             try
             {
-                predictionKey = _configuration.GetSection("CognitiveServices")["PREDICTION_KEY"];
-                predictionEndpoint = _configuration.GetSection("CognitiveServices")["RESOURCE_ENDPOINT"];
+                predictionKey = _configuration["PREDICTION-KEY"];
+                predictionEndpoint = _configuration["RESOURCE-ENDPOINT"];
                 projectId = new Guid("fcef7194-78b7-4fde-a411-b09281dc8c92");
             }
             catch (Exception ex)
