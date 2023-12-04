@@ -1,5 +1,4 @@
-﻿using System;
-using BeMyEyes.Application.Interfaces.AIServices;
+﻿using BeMyEyes.Application.Interfaces.AIServices;
 using Microsoft.Azure.CognitiveServices.Vision.ComputerVision;
 using Microsoft.Azure.CognitiveServices.Vision.ComputerVision.Models;
 using Microsoft.Extensions.Configuration;

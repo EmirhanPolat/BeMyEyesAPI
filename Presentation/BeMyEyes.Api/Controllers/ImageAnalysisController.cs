@@ -98,7 +98,7 @@ namespace BeMyEyes.Api.Controllers
             {
                 return BadRequest("Invalid image upload"); ;
             }
-            Console.WriteLine("olduuuuu");
+
             byte[] imageBytes;
             using (var ms = new MemoryStream())
             {
