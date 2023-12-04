@@ -121,7 +121,7 @@ namespace BeMyEyes.Infrastructure.Services.AIServices
                 double number_of_words = line.Words.Count;
                 double total_confidence = 0.0;
                 double weighted_confidence;
-                double threshold = 0.5;
+                double threshold = 0.85;
 
                 foreach(var words in line.Words)
                 {
@@ -133,6 +133,10 @@ namespace BeMyEyes.Infrastructure.Services.AIServices
                 if (weighted_confidence >=  threshold)
                 {
                     linesConfidence.Add(line.Text, weighted_confidence);
+                }
+                else
+                {
+                    continue;
                 }
             }
 
