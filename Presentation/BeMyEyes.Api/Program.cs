@@ -10,8 +10,8 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
-builder.Services.AddTransient<IComputerVisionService, ComputerVisionService>();
 builder.Services.AddTransient<ICustomVisionService, CustomVisionService>();
+builder.Services.AddTransient<IComputerVisionService, ComputerVisionService>();
 
 var env = builder.Environment;
 
@@ -19,15 +19,11 @@ builder.Configuration.SetBasePath(env.ContentRootPath)
     .AddJsonFile("appsettings.json", optional: false)
     .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true);
 
+var keyVaultEndpoint = builder.Configuration.GetSection("KeyVault")["Uri"];
+builder.Configuration.AddAzureKeyVault(new Uri(keyVaultEndpoint), new DefaultAzureCredential());
+
 builder.Services.AddPersistence(builder.Configuration);
 builder.Services.AddInfrastructure(builder.Configuration);
-
-var keyVaultUri = builder.Configuration["KeyVault:Uri"];
-if (!string.IsNullOrEmpty(keyVaultUri))
-{
-    var credential = new DefaultAzureCredential();
-    builder.Configuration.AddAzureKeyVault(new Uri(keyVaultUri), credential);
-}
 
 var app = builder.Build();
 
@@ -37,6 +33,7 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
 
 app.UseHttpsRedirection();
 

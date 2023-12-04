@@ -3,14 +3,21 @@
     "secrets1": {
       "type": "secrets.user"
     },
-    "apis1": {
-      "ignored": "True",
-      "type": "apis"
-    },
     "compute.appService1": {
       "group": "connections",
       "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.Web/sites/BeMyEyesDeploy",
       "type": "compute.appService.windows"
+    },
+    "secrets2": {
+      "secretStore": null,
+      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.KeyVault/vaults/BeMyEyesKeys",
+      "type": "secrets.keyVault",
+      "connectionId": "KeyVault:Uri",
+      "dynamicId": null
+    },
+    "apis1": {
+      "ignored": "True",
+      "type": "apis"
     }
   }
 }
