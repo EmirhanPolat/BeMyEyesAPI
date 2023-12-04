@@ -32,7 +32,6 @@ namespace BeMyEyes.Infrastructure.Services.AIServices
 
             Thread.Sleep(2000);
 
-            //var id = Path.GetFileName(new Uri(url.OperationLocation).LocalPath);
 
             var operationLocation = url.OperationLocation;
             var sizeID = 36;
@@ -48,21 +47,6 @@ namespace BeMyEyes.Infrastructure.Services.AIServices
             while (analysis.Status == OperationStatusCodes.Running ||
                         analysis.Status == OperationStatusCodes.NotStarted);
 
-
-
-            //Console.WriteLine(url.OperationLocation);
-            //var values = analysis.AnalyzeResult.ReadResults;
-
-            //Console.WriteLine(analysis.AnalyzeResult.ReadResults);
-            //Console.WriteLine(analysis.Status);
-
-            //foreach (ReadResult page in values)
-            //{
-            //    foreach (Line line in page.Lines)
-            //    {
-            //        Console.WriteLine(line.Text);
-            //    }
-            //}
 
             return DisplayLines(analysis);
         }
