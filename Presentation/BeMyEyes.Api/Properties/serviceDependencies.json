@@ -9,10 +9,6 @@
     "compute.appService1": {
       "group": "connections",
       "type": "compute.appService"
-    },
-    "mssql1": {
-      "type": "mssql",
-      "connectionId": "ConnectionStrings:DefaultConnection"
     }
   }
 }
