@@ -106,9 +106,9 @@ namespace BeMyEyes.Api.Controllers
                 imageBytes = ms.ToArray();
             }
 
-            var (val, message) = await _computerVisionService.GetWordsInImage(imageBytes);
+            var result = await _computerVisionService.GetWordsInImage(imageBytes);
 
-            return Ok(message);
+            return Ok(result);
         }
 
         [HttpPost("moneyPredict")]
