@@ -19,11 +19,12 @@ namespace BeMyEyes.Api.Controllers
         [HttpPost("describeImage")]
         public async Task<IActionResult> DescribeImage(IFormFile imageFile)
         {
-            if (imageFile == null)
+            if (imageFile == null || imageFile.Length/1024 > 4096)
             {
-                return BadRequest("Invalid image upload");
+                return BadRequest("Invalid image upload or image size too big");
             }
 
+            Console.WriteLine(imageFile.Length/1024);
             byte[] imageBytes;
             using (var ms = new MemoryStream())
             {
@@ -31,11 +32,13 @@ namespace BeMyEyes.Api.Controllers
                 imageBytes = ms.ToArray();
             }
 
+            var messagggee = await _computerVisionService.WhatsInTheImage(imageBytes);
+
             var (status, message) = await _computerVisionService.GetDescriptionsInImage(imageBytes);
 
             if (status == 0)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, message);
+                return BadRequest(message);
             }
 
             return Ok(message);
