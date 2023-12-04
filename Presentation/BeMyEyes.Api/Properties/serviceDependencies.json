@@ -1,8 +1,5 @@
 {
   "dependencies": {
-    "apis1": {
-      "type": "apis"
-    },
     "secrets1": {
       "type": "secrets"
     },
@@ -10,9 +7,17 @@
       "group": "connections",
       "type": "compute.appService"
     },
+    "secrets2": {
+      "type": "secrets",
+      "connectionId": "KeyVault:Uri",
+      "dynamicId": null
+    },
+    "apis1": {
+      "type": "apis"
+    },
     "mssql1": {
-      "type": "mssql",
-      "connectionId": "ConnectionStrings:DefaultConnection"
+      "ignored": "true",
+      "type": "mssql"
     }
   }
 }

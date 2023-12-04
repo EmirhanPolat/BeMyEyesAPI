@@ -3,21 +3,21 @@
     "secrets1": {
       "type": "secrets.user"
     },
-    "apis1": {
-      "ignored": "True",
-      "type": "apis"
-    },
     "compute.appService1": {
       "group": "connections",
       "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.Web/sites/BeMyEyesDeploy",
       "type": "compute.appService.windows"
     },
-    "mssql1": {
-      "serviceConnectorResourceId": "/subscriptions/[parameters('subscriptionId')]/resourcegroups/[parameters('resourceGroupName')]/providers/Microsoft.ServiceLinker/locations/eastus/connectors/ConnectionStringsDefaultConnection_6AF8B1CA78",
-      "secretStore": "LocalSecretsFile",
-      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourcegroups/[parameters('resourceGroupName')]/providers/Microsoft.Sql/servers/bemyeyesazuredb/databases/BeMyEyesDB",
-      "type": "mssql.azure",
-      "connectionId": "ConnectionStrings:DefaultConnection"
+    "secrets2": {
+      "secretStore": null,
+      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.KeyVault/vaults/BeMyEyesKeys",
+      "type": "secrets.keyVault",
+      "connectionId": "KeyVault:Uri",
+      "dynamicId": null
+    },
+    "apis1": {
+      "ignored": "True",
+      "type": "apis"
     }
   }
 }

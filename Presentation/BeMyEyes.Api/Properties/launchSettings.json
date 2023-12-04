@@ -15,7 +15,9 @@
       "launchUrl": "swagger",
       "applicationUrl": "http://localhost:5024",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Development"
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "KeyVault:Uri": "https://bemyeyeskeys.vault.azure.net/",
+        "AZURE_USERNAME": "APOLAT19@ku.edu.tr"
       },
       "dotnetRunMessages": true
     },
@@ -25,7 +27,9 @@
       "launchUrl": "swagger",
       "applicationUrl": "https://bemyeyesdeploy.azurewebsites.net/",
       "environmentVariables": {
-        "ASPNETCORE_ENVIRONMENT": "Production"
+        "ASPNETCORE_ENVIRONMENT": "Production",
+        "KeyVault:Uri": "https://bemyeyeskeys.vault.azure.net/",
+        "AZURE_USERNAME": "APOLAT19@ku.edu.tr"
       },
       "dotnetRunMessages": true
     }
