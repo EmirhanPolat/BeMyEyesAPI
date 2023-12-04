@@ -22,7 +22,7 @@ namespace BeMyEyes.Infrastructure.Services.Auth
 
         public async Task<(int, string)> Registration(RegistrationModel model, string[] roles)
         {
-            var userExists = await userManager.FindByNameAsync(model.Username);
+            var userExists = await userManager.FindByEmailAsync(model.Email);
 
             if (userExists != null)
                 return (0, "User already exists");
@@ -53,10 +53,10 @@ namespace BeMyEyes.Infrastructure.Services.Auth
 
         public async Task<(int, string)> Login(LoginModel model)
         {
-            var user = await userManager.FindByNameAsync(model.Username);
+            var user = await userManager.FindByEmailAsync(model.Email);
 
             if (user == null)
-                return (0, "Invalid username");
+                return (0, "Invalid email");
             if (!await userManager.CheckPasswordAsync(user, model.Password))
                 return (0, "Invalid password");
 
