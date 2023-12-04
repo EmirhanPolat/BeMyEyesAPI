@@ -25,9 +25,36 @@ namespace BeMyEyes.Infrastructure.Services.AIServices
             };
         }
 
+        public async Task<IDictionary<string, double>> GetWordsInImage(byte[] byteData)
+        {
+            var url = await cvClient.ReadInStreamAsync(new MemoryStream(byteData));
+
+            Thread.Sleep(2000);
+
+
+            var operationLocation = url.OperationLocation;
+            var sizeID = 36;
+
+            var ID = operationLocation.Substring(operationLocation.Length - sizeID);
+
+
+            ReadOperationResult analysis;
+            do
+                {
+                analysis = await cvClient.GetReadResultAsync(new Guid(ID));
+            }
+            while (analysis.Status == OperationStatusCodes.Running ||
+                        analysis.Status == OperationStatusCodes.NotStarted);
+
+
+            return DisplayLines(analysis);
+        }
+
+
         public async Task<(int, string)> GetDescriptionsInImage(byte[] byteData)
         {
             var analysis = await cvClient.DescribeImageInStreamAsync(new MemoryStream(byteData));
+            
 
             return (1, analysis.Captions.First().Text);
         }
@@ -84,6 +111,37 @@ namespace BeMyEyes.Infrastructure.Services.AIServices
             return objectsConfidence;
         }
 
+        private static IDictionary<string, double> DisplayLines(ReadOperationResult analysis)
+        {
+            var linesConfidence = new Dictionary<string, double>();
+
+            foreach (var line in analysis.AnalyzeResult.ReadResults[0].Lines)
+            {
+                double number_of_words = line.Words.Count;
+                double total_confidence = 0.0;
+                double weighted_confidence;
+                double threshold = 0.85;
+
+                foreach(var words in line.Words)
+                {
+                    total_confidence += words.Confidence;
+                }
+
+                weighted_confidence = total_confidence / number_of_words;
+
+                if (weighted_confidence >=  threshold)
+                {
+                    linesConfidence.Add(line.Text, weighted_confidence);
+                }
+                else
+                {
+                    continue;
+                }
+            }
+
+            return linesConfidence;
+        }
+
         private void GetResourceVariables()
         {
             try
@@ -96,5 +154,6 @@ namespace BeMyEyes.Infrastructure.Services.AIServices
                 Console.WriteLine($"Error in GetResourceVariables: {ex.Message}");
             }
         }
+
     }
 }
