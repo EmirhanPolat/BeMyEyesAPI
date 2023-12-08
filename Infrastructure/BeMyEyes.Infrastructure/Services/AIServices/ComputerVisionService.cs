@@ -85,11 +85,8 @@ namespace BeMyEyes.Infrastructure.Services.AIServices
             // Set up the request headers
             client.DefaultRequestHeaders.Add("Authorization", $"Bearer {chat_key}"); // Replace with your API key
 
-            var helperPrompt = "Hi, I will provide some results to you. The description gives you the main idea, " +
-                "the objects gives you the detected objects, and the tags contain some useful information (not all of the tags are necessary). " +
-                "Given these results, I want you to provide a summary response which insights these results (max of 2-3 sentence, be specific and don't waste your tokens) " +
-                "Do not say things like 'in this image' or 'in the analysis result', just directly say what's in the image. Keep in mind that your response will be converted to speech for visually impaired people to understand their surroundings\r\n\r\n" +
-                $"Here are the results:\r\n Description: {briefDescription}\n Objects: {objects}\n Tags: {tags}";
+            var helperPrompt = "Hello, based on the given results, provide a concise summary (2-3 sentences max) that clearly describes the scene. Ensure the summary is detailed and spatially informative, suitable for assisting visually impaired individuals in understanding their surroundings. Avoid phrases like 'in this image' or 'in the analysis result', and directly describe the content." +
+                            $"Here are the results:\r\n Description: {briefDescription}\n Objects: {objects}\n Tags: {tags}";
             
             // Create the payload
             var payload = new
