@@ -32,66 +32,9 @@ namespace BeMyEyes.Api.Controllers
                 imageBytes = ms.ToArray();
             }
 
-            var messagggee = await _computerVisionService.WhatsInTheImage(imageBytes);
+            var messagggee = await _computerVisionService.DescribeImage(imageBytes);
 
-            var (status, message) = await _computerVisionService.GetDescriptionsInImage(imageBytes);
-
-            if (status == 0)
-            {
-                return BadRequest(message);
-            }
-
-            return Ok(message);
-        }
-
-        [HttpPost("objectsImage")]
-        public async Task<IActionResult> GetObjectsInImage(IFormFile imageFile)
-        {
-            if (imageFile == null)
-            {
-                return BadRequest("Invalid image upload");
-            }
-
-            byte[] imageBytes;
-            using (var ms = new MemoryStream())
-            {
-                imageFile.CopyTo(ms);
-                imageBytes = ms.ToArray();
-            }
-
-            var result = await _computerVisionService.GetObjectsInImage(imageBytes);
-
-            if (result == null)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
-
-            return Ok(result);
-        }
-
-        [HttpPost("tagsImage")]
-        public async Task<IActionResult> GetTagsInImage(IFormFile imageFile)
-        {
-            if (imageFile == null)
-            {
-                return BadRequest("Invalid image upload");
-            }
-
-            byte[] imageBytes;
-            using (var ms = new MemoryStream())
-            {
-                imageFile.CopyTo(ms);
-                imageBytes = ms.ToArray();
-            }
-
-            var result = await _computerVisionService.GetTagsInImage(imageBytes);
-
-            if (result == null)
-            {
-                return StatusCode(StatusCodes.Status500InternalServerError);
-            }
-
-            return Ok(result);
+            return Ok(messagggee);
         }
 
         [HttpPost("wordsImage")]
