@@ -8,7 +8,6 @@ using Newtonsoft.Json.Linq;
 
 namespace BeMyEyes.Infrastructure.Services.AIServices
 {
-
     public class ComputerVisionService : IComputerVisionService
     {
         private string subscriptionKey;
@@ -77,7 +76,6 @@ namespace BeMyEyes.Infrastructure.Services.AIServices
 
             var objects = JsonConvert.SerializeObject(objectsInImage);
             var tags = JsonConvert.SerializeObject(tagsInImage);
-
             
             var client = new HttpClient();
             var requestUri = "https://api.openai.com/v1/chat/completions"; // The API endpoint
@@ -121,7 +119,7 @@ namespace BeMyEyes.Infrastructure.Services.AIServices
             // Extracting the 'message' part
             var message = jsonResponse["choices"][0]["message"]["content"].ToString();
 
-            // Print the response
+            // Return the response
             return message;
         }
 

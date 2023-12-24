@@ -9,11 +9,13 @@ namespace BeMyEyes.Api.Controllers
     {
         private readonly IComputerVisionService _computerVisionService;
         private readonly ICustomVisionService _customVisionService;
+        private readonly ISpeechService _speechService;
 
-        public ImageAnalysisController(IComputerVisionService computerVisionService, ICustomVisionService customVisionService)
+        public ImageAnalysisController(IComputerVisionService computerVisionService, ICustomVisionService customVisionService, ISpeechService speechService)
         {
             _computerVisionService = computerVisionService;
             _customVisionService = customVisionService;
+            _speechService = speechService;
         }
 
         [HttpPost("describeImage")]
@@ -24,7 +26,6 @@ namespace BeMyEyes.Api.Controllers
                 return BadRequest("Invalid image upload or image size too big");
             }
 
-            Console.WriteLine(imageFile.Length/1024);
             byte[] imageBytes;
             using (var ms = new MemoryStream())
             {
@@ -32,9 +33,11 @@ namespace BeMyEyes.Api.Controllers
                 imageBytes = ms.ToArray();
             }
 
-            var messagggee = await _computerVisionService.DescribeImage(imageBytes);
+            var aa = _speechService.GetSpeech();
 
-            return Ok(messagggee);
+            //var messagggee = await _computerVisionService.DescribeImage(imageBytes);
+
+            return Ok(aa);
         }
 
         [HttpPost("wordsImage")]
