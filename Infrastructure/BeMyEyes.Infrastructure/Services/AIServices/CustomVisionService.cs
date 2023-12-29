@@ -29,7 +29,7 @@ namespace BeMyEyes.Infrastructure.Services.AIServices
             {
                 var prediction = await predictionClient.ClassifyImageAsync(projectId, "MoneyClassification", new MemoryStream(byteData));
 
-                if (prediction.Predictions.First().Probability >= 0.5)
+                if (prediction.Predictions.First().Probability >= 0.8)
                 {
                     return (prediction.Predictions.First().Probability, prediction.Predictions.First().TagName);
                 }
