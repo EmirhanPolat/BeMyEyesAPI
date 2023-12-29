@@ -1,15 +1,13 @@
-﻿using Azure.AI.OpenAI;
-using Azure;
-using BeMyEyes.Application.Interfaces.AIServices;
+﻿using BeMyEyes.Application.Interfaces.AIServices;
 using Microsoft.Azure.CognitiveServices.Vision.ComputerVision;
 using Microsoft.Azure.CognitiveServices.Vision.ComputerVision.Models;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using System.Text;
+using Newtonsoft.Json.Linq;
 
 namespace BeMyEyes.Infrastructure.Services.AIServices
 {
-
     public class ComputerVisionService : IComputerVisionService
     {
         private string subscriptionKey;
@@ -37,7 +35,6 @@ namespace BeMyEyes.Infrastructure.Services.AIServices
 
             Thread.Sleep(2000);
 
-
             var operationLocation = url.OperationLocation;
             var sizeID = 36;
 
@@ -52,34 +49,43 @@ namespace BeMyEyes.Infrastructure.Services.AIServices
             while (analysis.Status == OperationStatusCodes.Running ||
                         analysis.Status == OperationStatusCodes.NotStarted);
 
-
             return DisplayLines(analysis);
         }
 
 
-        public async Task<(int, string)> GetDescriptionsInImage(byte[] byteData)
+        private async Task<string> GetDescriptionsInImage(byte[] byteData)
         {         
             try
             {
                 var analysis = await cvClient.DescribeImageInStreamAsync(new MemoryStream(byteData));
-                return (1, analysis.Captions.First().Text);
+                return (analysis.Captions.First().Text);
             }
             catch (Exception ex)
             {
                 // Handle other exceptions here
-                return (0, $"Error: {ex.Message}");
+                return ($"Error: {ex.Message}");
             }
 
         }
 
-        public async Task<string> WhatsInTheImage(byte[] byteData)
+        public async Task<string> DescribeImage(byte[] byteData)
         {
+            var briefDescription = await GetDescriptionsInImage(byteData);
+            var objectsInImage = await GetObjectsInImage(byteData);
+            var tagsInImage = await GetTagsInImage(byteData);
+
+            var objects = JsonConvert.SerializeObject(objectsInImage);
+            var tags = JsonConvert.SerializeObject(tagsInImage);
+            
             var client = new HttpClient();
             var requestUri = "https://api.openai.com/v1/chat/completions"; // The API endpoint
 
             // Set up the request headers
             client.DefaultRequestHeaders.Add("Authorization", $"Bearer {chat_key}"); // Replace with your API key
 
+            var helperPrompt = "Hello, based on the given results, provide a concise summary (2-3 sentences max) that clearly describes the scene. Ensure the summary is detailed and spatially informative, suitable for assisting visually impaired individuals in understanding their surroundings. Avoid phrases like 'in this image' or 'in the analysis result', and directly describe the content." +
+                            $"Here are the results:\r\n Description: {briefDescription}\n Objects: {objects}\n Tags: {tags}";
+            
             // Create the payload
             var payload = new
             {
@@ -91,16 +97,11 @@ namespace BeMyEyes.Infrastructure.Services.AIServices
                         role = "user",
                         content = new object[]
                         {
-                            new { type = "text", text = "Say Test!" },
-                            //new
-                            //{
-                            //    type = "image_url",
-                            //    image_url = new { url = "https://upload.wikimedia.org/wikipedia/commons/thumb/d/dd/Gfp-wisconsin-madison-the-nature-boardwalk.jpg/2560px-Gfp-wisconsin-madison-the-nature-boardwalk.jpg" }
-                            //}
+                            new { type = "text", text = helperPrompt }
                         }
                     }
                 },
-                max_tokens = 2,
+                max_tokens = 40,
                 temperature = 0
             };
 
@@ -112,17 +113,22 @@ namespace BeMyEyes.Infrastructure.Services.AIServices
             var response = await client.PostAsync(requestUri, content);
             var responseString = await response.Content.ReadAsStringAsync();
 
-            // Print the response
-            return responseString;
+            // Assuming responseString contains your JSON response
+            var jsonResponse = JObject.Parse(responseString);
+
+            // Extracting the 'message' part
+            var message = jsonResponse["choices"][0]["message"]["content"].ToString();
+
+            // Return the response
+            return message;
         }
 
-        public async Task<IDictionary<string, double>> GetObjectsInImage(byte[] byteData)
+        private async Task<IDictionary<string, double>> GetObjectsInImage(byte[] byteData)
         {
             try
             {
                 var analysis = await cvClient.DetectObjectsInStreamAsync(new MemoryStream(byteData));
                 return DisplayObjects(analysis);
-
             }
             catch (Exception)
             {
@@ -131,7 +137,7 @@ namespace BeMyEyes.Infrastructure.Services.AIServices
             }
         }
 
-        public async Task<IDictionary<string, double>> GetTagsInImage(byte[] byteData)
+        private async Task<IDictionary<string, double>> GetTagsInImage(byte[] byteData)
         {
             try
             {

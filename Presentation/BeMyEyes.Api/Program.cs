@@ -11,7 +11,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 builder.Services.AddTransient<ICustomVisionService, CustomVisionService>();
-builder.Services.AddTransient<IComputerVisionService, ComputerVisionService>();
+builder.Services.AddTransient<IComputerVisionService, ComputerVisionService>(); 
 
 var env = builder.Environment;
 
