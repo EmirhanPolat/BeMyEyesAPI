@@ -9,13 +9,10 @@ namespace BeMyEyes.Api.Controllers
     {
         private readonly IComputerVisionService _computerVisionService;
         private readonly ICustomVisionService _customVisionService;
-        private readonly ISpeechService _speechService;
-
-        public ImageAnalysisController(IComputerVisionService computerVisionService, ICustomVisionService customVisionService, ISpeechService speechService)
+        public ImageAnalysisController(IComputerVisionService computerVisionService, ICustomVisionService customVisionService)
         {
             _computerVisionService = computerVisionService;
             _customVisionService = customVisionService;
-            _speechService = speechService;
         }
 
         [HttpPost("describeImage")]
@@ -33,11 +30,9 @@ namespace BeMyEyes.Api.Controllers
                 imageBytes = ms.ToArray();
             }
 
-            var aa = _speechService.GetSpeech();
+            var message = await _computerVisionService.DescribeImage(imageBytes);
 
-            //var messagggee = await _computerVisionService.DescribeImage(imageBytes);
-
-            return Ok(aa);
+            return Ok(message);
         }
 
         [HttpPost("wordsImage")]
