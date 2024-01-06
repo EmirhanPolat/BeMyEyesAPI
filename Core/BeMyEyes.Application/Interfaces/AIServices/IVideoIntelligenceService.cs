@@ -3,7 +3,7 @@ namespace BeMyEyes.Application.Interfaces.AIServices
 {
 	public interface IVideoIntelligenceService
 	{
-        Task<double> GetVideoSummarization(byte[] byteData);
+        Task<string> GetVideoSummarization(byte[] byteData);
     }
 }
 
