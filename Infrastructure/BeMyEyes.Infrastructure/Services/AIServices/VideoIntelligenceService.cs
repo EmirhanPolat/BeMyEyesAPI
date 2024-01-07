@@ -24,7 +24,7 @@ namespace BeMyEyes.Infrastructure.Services.AIServices
         public VideoIntelligenceService(IConfiguration configuration)
 		{
             // We can access the Environment variable this way too !!! 
-            string keyFilePath = "/Users/ardapoyraz/Documents/Koc_University/Semester9/Proje_API_KEY/acoustic-patrol-409018-51b0c6911bce.json";
+            string keyFilePath = "C:/Users/Emirhan/Desktop/KOC/SmartHat/acoustic-patrol-409018-51b0c6911bce.json";
             Environment.SetEnvironmentVariable("GOOGLE_APPLICATION_CREDENTIALS", keyFilePath);
             _configuration = configuration;
             GetResourceVariables();
@@ -42,8 +42,11 @@ namespace BeMyEyes.Infrastructure.Services.AIServices
             // Set up the request headers
             client.DefaultRequestHeaders.Add("Authorization", $"Bearer {chat_key}"); // Replace with your API key
 
-            var helperPrompt = "Create summary (5-6 sentences max) for a video, tailored for visually impaired users. Focus on the essence of the video, inferring possible actions from the elements' sizes and movements using bounding box. If actions are unclear, omit them. The summary should be human-like, capturing the video's atmosphere and key elements without referencing the data structure or technical specifics. " +
-                            $"Here is the data:\r\n Data: {analysis}";
+            var helperPrompt = "Summarize in 5-6 sentences (100 words max) by describing what's in the frame and their positions. " +
+                "If elements or their arrangements are unclear, mention the uncertainty without assuming. " +
+                "The summary should emphasize the composition and atmosphere, steering clear of technical jargon. " +
+                $"Data: {analysis}";
+
 
             // Create the payload
             var payload = new
@@ -60,25 +63,20 @@ namespace BeMyEyes.Infrastructure.Services.AIServices
                         }
                     }
                 },
-                max_tokens = 60,
-                temperature = 0.3
+                max_tokens = 100,
+                temperature = 0.0
             };
 
-            // Serialize the payload to JSON
+            
             var jsonPayload = JsonConvert.SerializeObject(payload);
             var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
-
-            // Make the request
+       
             var response = await client.PostAsync(requestUri, content);
             var responseString = await response.Content.ReadAsStringAsync();
 
-            // Assuming responseString contains your JSON response
             var jsonResponse = JObject.Parse(responseString);
 
-            // Extracting the 'message' part
             var message = jsonResponse["choices"][0]["message"]["content"].ToString();
-
-            // Return the response
             return message;
         }
 
@@ -105,31 +103,23 @@ namespace BeMyEyes.Infrastructure.Services.AIServices
                     },
                     PersonDetectionConfig = new PersonDetectionConfig
                     {
-                        IncludeBoundingBoxes = true, // Set your desired confidence threshold
+                        IncludeBoundingBoxes = true,
                         IncludeAttributes = true,
                    
                     }
                 },
                 InputContent = videoByteString,
             };
-            // Make the request
             Operation<AnnotateVideoResponse, AnnotateVideoProgress> response = await client.AnnotateVideoAsync(request);
-
-            // Poll until the returned long-running operation is complete
             Operation<AnnotateVideoResponse, AnnotateVideoProgress> completedResponse = await response.PollUntilCompletedAsync();
-            // Retrieve the operation result
             VideoAnnotationResults analysis = completedResponse.Result.AnnotationResults[0];
-
-
             AnnotationResult annotationResult = AnalyzeVideo(analysis);
+            if(annotationResult != null)
+            {
+                return "";
+            }
 
-
-            string jsonAnnotationResult = Newtonsoft.Json.JsonConvert.SerializeObject(annotationResult);
-
-            // Console.WriteLine(jsonAnnotationResult);
-            //string json = System.Text.Json.JsonSerializer.Serialize(result.ToString, new JsonSerializerOptions { WriteIndented = true });
-
-
+            string jsonAnnotationResult = JsonConvert.SerializeObject(annotationResult);
             return jsonAnnotationResult;
         }
 

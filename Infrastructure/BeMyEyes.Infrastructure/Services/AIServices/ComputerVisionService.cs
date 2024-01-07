@@ -74,19 +74,24 @@ namespace BeMyEyes.Infrastructure.Services.AIServices
             var objectsInImage = await GetObjectsInImage(byteData);
             var tagsInImage = await GetTagsInImage(byteData);
 
+            if(tagsInImage.Count == 0 && objectsInImage.Count == 0)
+            {
+                return "Error Analyzing";
+            }
+
             var objects = JsonConvert.SerializeObject(objectsInImage);
             var tags = JsonConvert.SerializeObject(tagsInImage);
             
             var client = new HttpClient();
-            var requestUri = "https://api.openai.com/v1/chat/completions"; // The API endpoint
+            var requestUri = "https://api.openai.com/v1/chat/completions"; 
 
-            // Set up the request headers
-            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {chat_key}"); // Replace with your API key
+            client.DefaultRequestHeaders.Add("Authorization", $"Bearer {chat_key}");
 
-            var helperPrompt = "Hello, based on the given results, provide a concise summary (2-3 sentences max) that clearly describes the scene. Ensure the summary is detailed and spatially informative, suitable for assisting visually impaired individuals in understanding their surroundings. Avoid phrases like 'in this image' or 'in the analysis result', and directly describe the content." +
-                            $"Here are the results:\r\n Description: {briefDescription}\n Objects: {objects}\n Tags: {tags}";
-            
-            // Create the payload
+            var helperPrompt = "Generate a 2-3 sentence summary (concise and spatially descriptive) from the results. " +
+                "Highlight key objects and their spatial relationships. Directly convey the scene's essence, " +
+                "omitting technical phrases and data specifics. " +
+                $"Description: {briefDescription}\n Objects: {objects}\n Tags: {tags}";
+
             var payload = new
             {
                 model = "gpt-3.5-turbo",
@@ -101,25 +106,19 @@ namespace BeMyEyes.Infrastructure.Services.AIServices
                         }
                     }
                 },
-                max_tokens = 40,
+                max_tokens = 100,
                 temperature = 0
             };
 
-            // Serialize the payload to JSON
             var jsonPayload = JsonConvert.SerializeObject(payload);
             var content = new StringContent(jsonPayload, Encoding.UTF8, "application/json");
 
-            // Make the request
             var response = await client.PostAsync(requestUri, content);
             var responseString = await response.Content.ReadAsStringAsync();
 
-            // Assuming responseString contains your JSON response
             var jsonResponse = JObject.Parse(responseString);
 
-            // Extracting the 'message' part
             var message = jsonResponse["choices"][0]["message"]["content"].ToString();
-
-            // Return the response
             return message;
         }
 
