@@ -43,7 +43,7 @@ namespace BeMyEyes.Infrastructure.Services.AIServices
                 Console.WriteLine($"Custom Vision Error: {ex.Response.StatusCode} - {ex.Response.ReasonPhrase}");
                 Console.WriteLine($"Error Content: {ex.Response.Content}");
 
-                return (0, "Predd failed");
+                return (0, "");
             }
         }
 

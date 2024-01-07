@@ -9,10 +9,13 @@ namespace BeMyEyes.Api.Controllers
     {
         private readonly IComputerVisionService _computerVisionService;
         private readonly ICustomVisionService _customVisionService;
-        public ImageAnalysisController(IComputerVisionService computerVisionService, ICustomVisionService customVisionService)
+        private readonly IVideoIntelligenceService _videoIntelligenceService;
+
+        public ImageAnalysisController(IComputerVisionService computerVisionService, ICustomVisionService customVisionService, IVideoIntelligenceService videoIntelligenceService)
         {
             _computerVisionService = computerVisionService;
             _customVisionService = customVisionService;
+            _videoIntelligenceService = videoIntelligenceService;
         }
 
         [HttpPost("describeImage")]
@@ -31,6 +34,11 @@ namespace BeMyEyes.Api.Controllers
             }
 
             var message = await _computerVisionService.DescribeImage(imageBytes);
+
+            if(message == "")
+            {
+                return BadRequest("Analysis failed");
+            }
 
             return Ok(message);
         }
@@ -52,6 +60,35 @@ namespace BeMyEyes.Api.Controllers
 
             var result = await _computerVisionService.GetWordsInImage(imageBytes);
 
+            if(result.Count == 0)
+            {
+                return BadRequest("Analysis failed");
+            }
+
+            return Ok(result);
+        }
+
+        [HttpPost("summarizeVideo")]
+        public async Task<IActionResult> GetVideoSummarization(IFormFile videoFile)
+        {
+            if (videoFile == null)
+            {
+                return BadRequest("Invalid video upload"); ;
+            }
+
+            byte[] videoBytes;
+            using (var ms = new MemoryStream())
+            {
+                videoFile.CopyTo(ms);
+                videoBytes = ms.ToArray();
+            }
+
+            var result = await _videoIntelligenceService.GetVideoSummarization(videoBytes);
+
+            if(result == "")
+            {
+                return BadRequest("Analysis failed");
+            }
             return Ok(result);
         }
 
@@ -71,6 +108,11 @@ namespace BeMyEyes.Api.Controllers
             }
 
             var (probability, tag) = await _customVisionService.PredictImageTags(imageBytes);
+
+            if (tag == "")
+            {
+                return BadRequest("Analysis failed");
+            }
 
             return Ok(tag);
         }
