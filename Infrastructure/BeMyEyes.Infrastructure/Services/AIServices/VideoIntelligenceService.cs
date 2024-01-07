@@ -60,8 +60,8 @@ namespace BeMyEyes.Infrastructure.Services.AIServices
                         }
                     }
                 },
-                max_tokens = 45,
-                temperature = 0
+                max_tokens = 60,
+                temperature = 0.3
             };
 
             // Serialize the payload to JSON
