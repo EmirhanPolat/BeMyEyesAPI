@@ -42,9 +42,8 @@ namespace BeMyEyes.Infrastructure.Services.AIServices
             // Set up the request headers
             client.DefaultRequestHeaders.Add("Authorization", $"Bearer {chat_key}"); // Replace with your API key
 
-            var helperPrompt = "Summarize in 5-6 sentences (100 words max) by describing what's in the frame and their positions. " +
-                "If elements or their arrangements are unclear, mention the uncertainty without assuming. " +
-                "The summary should emphasize the composition and atmosphere, steering clear of technical jargon. " +
+            var helperPrompt = "Summarize in 5-6 sentences (80 words max) by describing what's in the frame" +
+                "The summary should be clear and descriptive, without using technical jargon. " +
                 $"Data: {analysis}";
 
 
@@ -114,7 +113,7 @@ namespace BeMyEyes.Infrastructure.Services.AIServices
             Operation<AnnotateVideoResponse, AnnotateVideoProgress> completedResponse = await response.PollUntilCompletedAsync();
             VideoAnnotationResults analysis = completedResponse.Result.AnnotationResults[0];
             AnnotationResult annotationResult = AnalyzeVideo(analysis);
-            if(annotationResult != null)
+            if(annotationResult == null)
             {
                 return "";
             }
